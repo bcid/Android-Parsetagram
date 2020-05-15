@@ -1,5 +1,6 @@
 package com.example.parsetagram;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +29,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +42,27 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSubmit;
     private File photoFile;
     public String photoFileName = "photo.jpg";
+    public Button btnNavPost;
+    public Button btnNavFeed;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.LogOut){
+            //Log out here
+            ParseUser.logOut();
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(i);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         btnCaptureImage = findViewById(R.id.btnCaputeImage);
         ivPostImage = findViewById(R.id.ivPostImage);
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnNavFeed = findViewById(R.id.btnNavFeed);
+        btnNavPost = findViewById(R.id.btnNavPost);
 
         btnCaptureImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +101,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //btnNavFeed.setOnClickListener(new View.OnClickListener() {
+         /*   @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), PostActivity.class);
+                startActivity(i);
+            }
+        })*/;
     }
+
 
     private void launchCamera() {
         // create Intent to take a picture and return control to the calling application
@@ -149,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
     private void queryPosts() {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
+        List<Post> posts = new ArrayList<>();
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
@@ -158,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 for (Post post: posts) {
                     Log.i(TAG, "POST: " + post.getDescription() + " username: " + post.getUser().getUsername());
+                    posts.add(post);
                 }
 
             }
