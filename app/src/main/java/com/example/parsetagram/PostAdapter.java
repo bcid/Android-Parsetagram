@@ -1,4 +1,4 @@
-package com.example.parsetagram.adapters;
+package com.example.parsetagram;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,17 +9,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
-import com.example.parsetagram.Post;
-import com.example.parsetagram.R;
+import com.parse.ParseFile;
 
 import java.util.List;
 
-public class PostAdapter extends  RecyclerView.Adapter<PostAdapter.ViewHolder > {
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
-    Context context;
-    List<Post> posts;
+    private Context context;
+    private List<Post> posts;
 
     public PostAdapter(Context context, List<Post> posts) {
         this.context = context;
@@ -29,15 +29,15 @@ public class PostAdapter extends  RecyclerView.Adapter<PostAdapter.ViewHolder > 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View postView = LayoutInflater.from(context).inflate(R.layout.item_post, parent, false);
-        return new ViewHolder(postView);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_post, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         Post post = posts.get(position);
         holder.bind(post);
+
     }
 
     @Override
@@ -45,23 +45,37 @@ public class PostAdapter extends  RecyclerView.Adapter<PostAdapter.ViewHolder > 
         return posts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView tvDescription;
-        TextView tvUsername;
-        ImageView ivPostImage;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private TextView tvUsername;
+        private TextView tvDescription;
+        private ImageView ivImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvDescription = itemView.findViewById(R.id.tvDescription);
             tvUsername = itemView.findViewById(R.id.tvUsername);
-            ivPostImage = itemView.findViewById(R.id.ivPostImage);
+            ivImage = itemView.findViewById(R.id.ivImage);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
         }
 
         public void bind(Post post) {
             tvDescription.setText(post.getDescription());
             tvUsername.setText(post.getUser().getUsername());
-            Glide.with(context).load(post.getImage()).into(ivPostImage);
+            ParseFile image = post.getImage();
+            if (image != null ) {
+                Glide.with(context).load(post.getImage().getUrl()).into(ivImage);
+            }
+
         }
+    }
+
+    public void clear() {
+        posts.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(List<Post> list) {
+        posts.addAll(list);
+        notifyDataSetChanged();
     }
 }
