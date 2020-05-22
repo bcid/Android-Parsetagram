@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new ComposeFragment();
                         break;
                     case R.id.action_profile:
+                        fragment = new com.example.parstagram.fragments.PostsFragment();
+                        break;
                     default:
                         fragment = new ComposeFragment();
                         break;
